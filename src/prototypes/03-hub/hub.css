@@ -1,0 +1,331 @@
+/* 03-hub — spinning network globe → graph or map. All styles scoped to .p03-hub. */
+
+.p03-hub {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 12%, #17205a 0%, rgba(11, 13, 36, 0) 60%),
+    radial-gradient(80% 70% at 85% 90%, rgba(47, 107, 255, .16) 0%, rgba(11, 13, 36, 0) 70%),
+    var(--bg);
+  color: var(--ink-on-dark);
+  user-select: none;
+}
+.p03-hub__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .35;
+  background-image:
+    linear-gradient(rgba(127, 178, 255, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(127, 178, 255, .05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(70% 70% at 50% 45%, #000 20%, transparent 100%);
+}
+
+/* ---------------- globe / orb ---------------- */
+.p03-orbwrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: top left;
+  z-index: 6;
+}
+.p03-orbwrap--mini { cursor: pointer; }
+.p03-orbwrap__ring {
+  position: absolute;
+  inset: 9%;
+  border-radius: 50%;
+  border: 2px dashed rgba(127, 178, 255, .18);
+  pointer-events: none;
+  transition: opacity .3s ease;
+  animation: p03-ringspin 90s linear infinite;
+}
+.p03-orbwrap__ring::after {
+  content: '';
+  position: absolute;
+  inset: 7%;
+  border-radius: 50%;
+  border: 1px solid rgba(127, 178, 255, .1);
+}
+@keyframes p03-ringspin { to { transform: rotate(360deg); } }
+
+.p03-globe { position: relative; }
+.p03-globe canvas { display: block; image-rendering: pixelated; touch-action: none; }
+.p03-globe__tip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 9px;
+  background: var(--panel);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 0 var(--ink);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 9;
+}
+.p03-globe__tip img {
+  width: 30px;
+  height: 30px;
+  image-rendering: pixelated;
+  border: 2px solid var(--ink);
+  background: #fff;
+}
+.p03-globe__tip-name { font-size: 10px; }
+.p03-globe__tip-sub { font-size: 15px; color: var(--ink-soft); line-height: 1; }
+
+/* ---------------- landing ---------------- */
+.p03-landing {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  z-index: 4;
+}
+.p03-hud {
+  color: var(--muted-on-dark);
+  font-size: 17px;
+  letter-spacing: .06em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.p03-hud__tick {
+  width: 7px;
+  height: 7px;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: p03-blink 1.4s steps(1) infinite;
+}
+@keyframes p03-blink { 0%, 60% { opacity: 1; } 61%, 100% { opacity: .15; } }
+
+.p03-tagline {
+  font-size: 20px;
+  color: var(--ink-on-dark);
+  animation: p03-drift 4.2s ease-in-out infinite;
+}
+@keyframes p03-drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.p03-landing .hp-search { width: 100%; max-width: 640px; }
+
+.p03-examples { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.p03-examples button {
+  background: rgba(127, 178, 255, .08);
+  border: 1px solid rgba(127, 178, 255, .28);
+  color: var(--muted-on-dark);
+  border-radius: 999px;
+  padding: 2px 12px;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.p03-examples button:hover { background: rgba(127, 178, 255, .2); color: var(--ink-on-dark); }
+
+/* ---------------- results shell ---------------- */
+.p03-results {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 3;
+}
+.p03-topbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* right padding clears the app's fixed top-right switcher (top:14px;
+     right:14px; open menu min-width 260px) so its toggle/menu never sits
+     on top of the search bar or summary text. */
+  padding: 14px 290px 14px 104px;
+  min-height: 100px;
+  flex-wrap: wrap;
+}
+.p03-summary {
+  flex: 1 1 200px;
+  min-width: 0;
+  color: var(--muted-on-dark);
+  font-size: 17px;
+  line-height: 1.15;
+  max-height: 2.4em;
+  overflow: hidden;
+}
+.p03-stage { position: relative; flex: 1 1 auto; min-height: 0; }
+
+.p03-note {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  color: var(--muted-on-dark);
+}
+.p03-note .pixel { font-size: 14px; color: var(--ink-on-dark); }
+
+.p03-busy {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-size: 11px;
+  padding: 8px 14px;
+  background: var(--bg-2);
+  border: 2px solid var(--blue-glow);
+  border-radius: 999px;
+  box-shadow: 0 0 18px rgba(47, 107, 255, .5);
+  animation: p03-pulse 1s ease-in-out infinite;
+}
+@keyframes p03-pulse { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
+
+/* ---------------- graph view ---------------- */
+.p03-graph { position: absolute; inset: 0; overflow: hidden; cursor: grab; touch-action: none; }
+.p03-graph:active { cursor: grabbing; }
+.p03-graph__links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.p03-link { fill: none; }
+.p03-link--member { stroke: var(--blue-glow); stroke-opacity: .5; stroke-width: 1.5; }
+.p03-link--sim { stroke: var(--blue-glow); stroke-opacity: .16; stroke-width: 1.5; stroke-dasharray: 4 7; }
+
+.p03-graph__nodes { position: absolute; inset: 0; transform-origin: 0 0; pointer-events: none; }
+.p03-node {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: auto;
+  cursor: grab;
+  will-change: transform;
+}
+.p03-node:active { cursor: grabbing; }
+.p03-node .hp-card__title { font-size: 10px; word-break: break-word; }
+.p03-node .hp-card { box-shadow: 0 5px 0 var(--ink), 0 0 24px rgba(47, 107, 255, .35); }
+.p03-node--small {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.p03-node__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid var(--blue-glow);
+  background: var(--panel);
+  image-rendering: pixelated;
+  box-shadow: 0 0 12px rgba(47, 107, 255, .55);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.p03-node--small:hover .p03-node__avatar { transform: scale(1.12); box-shadow: 0 0 18px rgba(255, 210, 63, .7); }
+.p03-node__label {
+  font-size: 9px;
+  color: var(--ink-on-dark);
+  background: rgba(11, 13, 36, .82);
+  border: 1px solid rgba(127, 178, 255, .3);
+  padding: 2px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .15s ease;
+  pointer-events: none;
+}
+.p03-node--small:hover .p03-node__label { opacity: 1; }
+.p03-node.is-selected .p03-node__avatar { border-color: var(--yellow); }
+
+.p03-graph__legend,
+.p03-map__legend {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  display: flex;
+  gap: 16px;
+  font-size: 16px;
+  color: var(--muted-on-dark);
+  pointer-events: none;
+  z-index: 2;
+}
+.p03-graph__legend span { display: inline-flex; align-items: center; gap: 6px; }
+.p03-legend__line { display: inline-block; width: 20px; height: 0; border-top: 2px solid var(--blue-glow); }
+.p03-legend__line--member { opacity: .6; }
+.p03-legend__line--sim { opacity: .3; border-top-style: dashed; }
+
+/* ---------------- map view ---------------- */
+.p03-map { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.p03-map__canvas { position: relative; flex: 1 1 auto; min-height: 0; }
+.p03-map__canvas canvas { display: block; image-rendering: pixelated; touch-action: none; cursor: grab; }
+.p03-map__strip {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 14px 20px 18px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-top: 2px solid rgba(127, 178, 255, .18);
+  background: linear-gradient(180deg, rgba(11, 13, 36, 0), rgba(20, 26, 61, .85));
+  scrollbar-width: thin;
+}
+.p03-map__slot {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 12px;
+  transition: background .15s ease, transform .15s ease;
+}
+.p03-map__slot.is-active { background: rgba(255, 210, 63, .14); transform: translateY(-4px); }
+
+/* ---------------- hint ---------------- */
+.p03-hint {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: var(--muted-on-dark);
+  background: rgba(20, 26, 61, .72);
+  border: 1px solid rgba(127, 178, 255, .22);
+  border-radius: 999px;
+  padding: 4px 8px 4px 14px;
+  backdrop-filter: blur(4px);
+}
+.p03-hub--map .p03-hint { bottom: 214px; }
+.p03-hint button {
+  border: 0;
+  background: rgba(127, 178, 255, .16);
+  color: var(--ink-on-dark);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+.p03-hint button:hover { background: var(--yellow); color: var(--ink); }
+
+@media (max-width: 900px) {
+  /* still clear the switcher's toggle button (it stays fixed top-right at
+     every viewport width) even though the layout is tighter here. */
+  .p03-topbar { padding-right: 170px; }
+  .p03-graph__legend { display: none; }
+}

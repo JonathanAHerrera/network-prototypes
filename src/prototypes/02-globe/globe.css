@@ -1,0 +1,339 @@
+/* 02-globe — every rule scoped under .p02 so nothing leaks to other prototypes. */
+
+.p02 {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 55%, #141a3d 0%, #0b0d24 55%, #06071a 100%);
+  color: var(--ink-on-dark);
+  user-select: none;
+}
+
+/* ---------------------------------------------------------------- backdrop */
+
+.p02__stars,
+.p02__twinkle {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.p02__stars { z-index: 0; }
+
+/* A few fat "pixel" stars that breathe on top of the dense canvas field. */
+.p02__twinkle {
+  z-index: 1;
+  opacity: .85;
+  background-repeat: repeat;
+  background-size: 260px 260px, 190px 190px, 330px 330px;
+  background-image:
+    radial-gradient(2px 2px at 30px 40px, rgba(127, 178, 255, .9) 50%, transparent 51%),
+    radial-gradient(2px 2px at 120px 150px, rgba(255, 210, 63, .75) 50%, transparent 51%),
+    radial-gradient(2px 2px at 60px 230px, rgba(33, 194, 214, .8) 50%, transparent 51%);
+  animation: p02-twinkle 4.2s steps(2, end) infinite;
+}
+@keyframes p02-twinkle {
+  0%, 100% { opacity: .28; }
+  50% { opacity: .95; }
+}
+
+.p02__globe {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+/* ---------------------------------------------------------------- markers */
+
+/*
+ * Two nodes per marker on purpose. CSS2DRenderer rewrites the wrapper's inline
+ * `transform` every frame to place it, and the layer's container is
+ * pointer-events:none — so the wrapper owns hit-testing and position, and the
+ * inner <i> owns every visual transform we control.
+ */
+.p02-marker {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: opacity .25s ease;
+}
+.p02-marker--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.p02-marker > i {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+  image-rendering: pixelated;
+  transition: transform .18s ease, opacity .2s ease, filter .2s ease;
+}
+.p02-marker--person > i { border-radius: 50%; }
+.p02-marker--project > i { border-radius: 3px; }
+
+.p02-marker:hover { z-index: 5; }
+.p02-marker:hover > i {
+  transform: scale(1.45);
+  filter: drop-shadow(0 0 6px var(--blue-glow));
+}
+
+.p02-marker--dim > i { opacity: .2; }
+.p02-marker--dim { cursor: default; }
+
+.p02-marker--hit > i {
+  transform: scale(1.55);
+  animation: p02-hit 1.1s steps(2, end) infinite;
+}
+@keyframes p02-hit {
+  0%, 100% { filter: drop-shadow(0 0 5px var(--blue-glow)); }
+  50% { filter: drop-shadow(0 0 11px var(--blue-glow)) drop-shadow(0 0 20px rgba(47, 107, 255, .8)); }
+}
+
+.p02-marker--sel { z-index: 6; }
+.p02-marker--sel > i {
+  transform: scale(1.7);
+  outline: 3px solid var(--yellow);
+  outline-offset: 3px;
+  filter: drop-shadow(0 0 8px rgba(255, 210, 63, .8));
+}
+
+/* ---------------------------------------------------------------- chrome */
+
+.p02__search {
+  position: absolute;
+  z-index: 20;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(640px, calc(100% - 130px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.p02__legend {
+  position: absolute;
+  z-index: 20;
+  top: 18px;
+  left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 11px;
+  background: rgba(20, 26, 61, .78);
+  border: 2px solid var(--blue);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, .45);
+  backdrop-filter: blur(3px);
+}
+.p02__legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  letter-spacing: .03em;
+  color: var(--ink-on-dark);
+  white-space: nowrap;
+}
+.p02__legend-swatch {
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--ink);
+  background: var(--person);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, .5);
+  flex: none;
+}
+.p02__legend-swatch--person { border-radius: 50%; }
+.p02__legend-swatch--project { border-radius: 3px; background: var(--project); }
+
+.p02__hint {
+  position: absolute;
+  z-index: 20;
+  left: 18px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(560px, calc(100% - 40px));
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--muted-on-dark);
+  background: rgba(11, 13, 36, .7);
+  border: 2px solid rgba(127, 178, 255, .35);
+  border-radius: var(--radius-sm);
+}
+.p02__hint b { color: var(--blue-glow); font-weight: 400; }
+.p02__hint-x {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(127, 178, 255, .45);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink-on-dark);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  cursor: pointer;
+}
+.p02__hint-x:hover { background: var(--blue); border-color: var(--blue-glow); }
+
+/* ---------------------------------------------------------------- loading */
+
+.p02__boot {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: #06071a;
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  color: var(--blue-glow);
+  letter-spacing: .05em;
+}
+.p02__boot span::after {
+  content: '_';
+  margin-left: 2px;
+  animation: p02-blink 1s steps(2, end) infinite;
+}
+@keyframes p02-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* ---------------------------------------------------------------- sheet */
+
+.p02__sheet {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40vh;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 18px 14px;
+  background: var(--panel);
+  color: var(--ink);
+  border-top: 3px solid var(--ink);
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -8px 0 rgba(0, 0, 0, .35), 0 -24px 60px rgba(0, 0, 0, .45);
+  touch-action: none;
+}
+.p02__grab {
+  width: 56px;
+  height: 6px;
+  margin: 2px auto 0;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  background: var(--panel-2);
+  cursor: grab;
+  flex: none;
+}
+.p02__sheet:active .p02__grab { cursor: grabbing; }
+
+.p02__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+}
+.p02__summary {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 21px;
+  line-height: 1.15;
+  color: var(--ink);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.p02__nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+.p02__count {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: .04em;
+  min-width: 54px;
+  text-align: center;
+}
+.p02__btn {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 3px 0 var(--ink);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+}
+.p02__btn:hover:not(:disabled) { background: var(--yellow); }
+.p02__btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 0 0 var(--ink); }
+.p02__btn:disabled { opacity: .35; cursor: not-allowed; }
+.p02__btn--close { background: var(--pink); }
+
+.p02__strip {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 4px 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink) transparent;
+}
+.p02__strip::-webkit-scrollbar { height: 8px; }
+.p02__strip::-webkit-scrollbar-thumb { background: var(--ink); border-radius: 4px; }
+.p02__strip > * { flex: none; }
+
+.p02__empty {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  color: var(--ink-soft);
+  text-align: center;
+  padding: 0 20px;
+}
+
+/* WebGL unavailable (headless CI / blocked GPU) */
+.p02__glfail {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0 24px;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted-on-dark);
+}
+
+/* The sheet owns vertical drag; the card strip keeps horizontal touch scroll. */
+.p02__strip { touch-action: pan-x; }

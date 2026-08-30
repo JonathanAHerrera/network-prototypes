@@ -1,0 +1,216 @@
+/* 04-graph — "Reorganizing Graph". All styles scoped under .p04 */
+
+.p04 {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 0%, #161c46 0%, var(--bg) 55%, #070917 100%);
+  user-select: none;
+}
+
+.p04__stage {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  cursor: grab;
+}
+.p04__stage:active { cursor: grabbing; }
+
+.p04__canvas { position: absolute; inset: 0; display: block; z-index: 1; }
+/* layout labels ride above the card layer so they are never occluded */
+.p04__canvas--top { z-index: 5; pointer-events: none; }
+
+.p04__layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  z-index: 2;
+}
+
+.p04-node {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform, opacity;
+  cursor: pointer;
+}
+.p04-node .hp-card { transition: box-shadow .15s ease; }
+.p04-node .hp-card:hover { transform: none; box-shadow: 0 7px 0 var(--ink); }
+
+/* ------------------------------------------------------------------ top ui */
+
+.p04__top {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, calc(100vw - 360px));
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+}
+
+.p04__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.p04__chip {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  line-height: 1;
+  padding: 6px 11px;
+  color: var(--ink-on-dark);
+  background: rgba(20, 26, 61, .82);
+  border: 2px solid var(--blue-glow);
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 0 0 rgba(47, 107, 255, 0);
+  transition: background .15s ease, box-shadow .15s ease, transform .12s ease;
+}
+.p04__chip:hover:not(:disabled) {
+  background: var(--blue);
+  box-shadow: 0 0 14px rgba(47, 107, 255, .75);
+  transform: translateY(-1px);
+}
+.p04__chip:disabled { opacity: .45; cursor: progress; }
+
+.p04__banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  border: var(--pixel-border) solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: 0 5px 0 var(--ink);
+  padding: 9px 12px;
+  animation: p04-pop-in .22s ease-out;
+}
+.p04__banner-text {
+  font-family: var(--font-mono);
+  font-size: 19px;
+  line-height: 1.15;
+  flex: 1;
+}
+.p04__pill {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: .04em;
+  padding: 4px 7px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--yellow);
+  white-space: nowrap;
+}
+
+.p04__reset { position: absolute; top: 14px; left: 14px; z-index: 10; }
+
+/* --------------------------------------------------------------- popover */
+
+.p04-pop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 260px;
+  z-index: 20;
+  background: var(--panel);
+  color: var(--ink);
+  border: var(--pixel-border) solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 0 var(--ink), 0 0 26px rgba(47, 107, 255, .35);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  animation: p04-fade-in .16s ease-out;
+}
+.p04-pop__close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.p04-pop__close:hover { color: var(--ink); }
+.p04-pop__img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  image-rendering: pixelated;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  background: #fff;
+}
+.p04-pop__name { font-size: 12px; line-height: 1.25; }
+.p04-pop__bio { font-size: 13px; line-height: 1.35; color: var(--ink-soft); }
+.p04-pop__tags { justify-content: flex-start; }
+.p04-pop__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+.p04-pop__dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink); }
+.p04-pop__sep { opacity: .6; }
+
+/* ------------------------------------------------------------------ hint */
+
+.p04__hint {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  color: var(--muted-on-dark);
+  background: rgba(11, 13, 36, .7);
+  border: 2px solid rgba(127, 178, 255, .28);
+  border-radius: 999px;
+  padding: 5px 8px 5px 14px;
+  backdrop-filter: blur(3px);
+}
+.p04__hint-x {
+  border: 0;
+  background: transparent;
+  color: var(--muted-on-dark);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.p04__hint-x:hover { color: var(--yellow); }
+
+/* NB: the popover's transform is driven per-frame from JS — animate opacity only. */
+@keyframes p04-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes p04-pop-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p04__banner, .p04-pop { animation: none; }
+}

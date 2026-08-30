@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&family=Nunito:wght@400;600;800&display=swap');
+
+/* Hopamine prototype design tokens — "Tamagotchi × pixel-cyber" */
+:root {
+  --bg: #0b0d24;            /* deep navy (ED's hacking screen / Gem's blue) */
+  --bg-2: #141a3d;
+  --panel: #fffdf5;         /* cream card surface (Tamagotchi shell / sprout sheet) */
+  --panel-2: #f3efe0;
+  --ink: #1b1f3a;
+  --ink-soft: #5a5f80;
+  --ink-on-dark: #e8ecff;
+  --muted-on-dark: #8d95c4;
+  --blue: #2f6bff;          /* electric blue accent */
+  --blue-glow: #7fb2ff;
+  --cyan: #21c2d6;
+  --pink: #ff8fb1;          /* blush */
+  --yellow: #ffd23f;        /* Ed's grin */
+  --green: #37c96c;         /* sprout */
+  --lime: #b8f55e;
+  --person: #ffb340;        /* circle-card tint */
+  --project: #2f6bff;       /* square-card tint */
+  --radius: 14px;
+  --radius-sm: 8px;
+  --pixel-border: 3px;
+  --shadow: 0 6px 0 rgba(0,0,0,.35), 0 0 0 3px var(--ink);
+  --shadow-soft: 0 10px 30px rgba(0,0,0,.35);
+  --font-pixel: 'Silkscreen', 'Press Start 2P', monospace;
+  --font-mono: 'VT323', monospace;
+  --font-body: 'Nunito', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink-on-dark);
+  font-family: var(--font-body);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button, input { font-family: inherit; font-size: inherit; }
+::selection { background: var(--yellow); color: var(--ink); }
+
+/* utility classes shared across prototypes */
+.pixel { font-family: var(--font-pixel); letter-spacing: .02em; }
+.mono { font-family: var(--font-mono); font-size: 1.15em; }
+.scanlines::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,.12) 2px 3px);
+}
+.glow { text-shadow: 0 0 8px var(--blue-glow), 0 0 22px rgba(47,107,255,.6); }
